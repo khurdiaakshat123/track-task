@@ -25,9 +25,11 @@ def get_supabase_client(token: str = None) -> Client:
     if not token or token.startswith("mock-session-"):
         return supabase
     try:
-        from supabase.client import ClientOptions
-        options = ClientOptions(headers={"Authorization": f"Bearer {token}"})
-        return create_client(supabase_url, supabase_anon_key, options=options)
+        # Create a new client instance
+        client = create_client(supabase_url, supabase_anon_key)
+        # Directly set the authorization header on the PostgREST session
+        client.postgrest.session.headers["Authorization"] = f"Bearer {token}"
+        return client
     except Exception as e:
         print(f"[WARNING] Failed to create request-scoped client: {e}")
         return supabase
