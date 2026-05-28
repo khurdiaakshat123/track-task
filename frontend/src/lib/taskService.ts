@@ -1,7 +1,7 @@
 import { Task, CreateTaskInput, UpdateTaskInput } from '@/types/task';
 import { supabase, isSupabaseConfigured } from './supabase';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 const getAuthHeaders = async () => {
   const headers: Record<string, string> = {
