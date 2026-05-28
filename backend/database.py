@@ -18,3 +18,16 @@ if supabase_url and supabase_anon_key and "your-supabase-project" not in supabas
         print(f"[WARNING] Supabase client failed to initialize: {e}")
         is_supabase_configured = False
         supabase = None
+
+def get_supabase_client(token: str = None) -> Client:
+    if not is_supabase_configured or not supabase:
+        return None
+    if not token or token.startswith("mock-session-"):
+        return supabase
+    try:
+        from supabase.client import ClientOptions
+        options = ClientOptions(headers={"Authorization": f"Bearer {token}"})
+        return create_client(supabase_url, supabase_anon_key, options=options)
+    except Exception as e:
+        print(f"[WARNING] Failed to create request-scoped client: {e}")
+        return supabase

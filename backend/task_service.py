@@ -1,7 +1,7 @@
 import datetime
 import uuid
 from typing import List, Dict, Any, Set
-from database import supabase, is_supabase_configured
+from database import supabase, is_supabase_configured, get_supabase_client
 import schemas
 
 # In-Memory storage mock for offline mode
@@ -120,19 +120,21 @@ def save_local_tasks(updated_user_tasks: List[Dict[str, Any]], user_id: str):
     onboarded_users.add(user_id)
 
 class TaskService:
-    async def test_connection(self) -> Dict[str, Any]:
-        if not is_supabase_configured or not supabase:
+    async def test_connection(self, token: str = None) -> Dict[str, Any]:
+        client = get_supabase_client(token)
+        if not is_supabase_configured or not client:
             return {"success": False, "error": "Supabase is not configured"}
         try:
-            supabase.table("tasks").select("id, user_id").limit(1).execute()
+            client.table("tasks").select("id, user_id").limit(1).execute()
             return {"success": True}
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    async def fetch_tasks(self, user_id: str) -> List[Dict[str, Any]]:
-        if is_supabase_configured and supabase:
+    async def fetch_tasks(self, user_id: str, token: str = None) -> List[Dict[str, Any]]:
+        client = get_supabase_client(token)
+        if is_supabase_configured and client:
             try:
-                response = supabase.table("tasks") \
+                response = client.table("tasks") \
                     .select("*") \
                     .eq("user_id", user_id) \
                     .order("created_at", desc=True) \
@@ -141,7 +143,7 @@ class TaskService:
                 
                 if len(data) == 0 and user_id not in onboarded_users:
                     demo_tasks = generate_demo_tasks(user_id)
-                    seed_response = supabase.table("tasks").insert([
+                    seed_response = client.table("tasks").insert([
                         {
                             "title": t["title"],
                             "description": t["description"],
@@ -161,7 +163,7 @@ class TaskService:
                 return get_local_tasks(user_id)
         return get_local_tasks(user_id)
 
-    async def add_task(self, input_data: schemas.CreateTaskInput, user_id: str) -> Dict[str, Any]:
+    async def add_task(self, input_data: schemas.CreateTaskInput, user_id: str, token: str = None) -> Dict[str, Any]:
         temp_id = str(uuid.uuid4())
         new_task = {
             "id": temp_id,
@@ -175,9 +177,10 @@ class TaskService:
             "completed_at": None
         }
 
-        if is_supabase_configured and supabase:
+        client = get_supabase_client(token)
+        if is_supabase_configured and client:
             try:
-                response = supabase.table("tasks").insert({
+                response = client.table("tasks").insert({
                     "title": input_data.title,
                     "description": input_data.description,
                     "due_date": input_data.due_date,
@@ -196,15 +199,16 @@ class TaskService:
         save_local_tasks(tasks, user_id)
         return new_task
 
-    async def update_task(self, task_id: str, updates: schemas.UpdateTaskInput, user_id: str) -> Dict[str, Any]:
+    async def update_task(self, task_id: str, updates: schemas.UpdateTaskInput, user_id: str, token: str = None) -> Dict[str, Any]:
         update_dict = {k: v for k, v in updates.model_dump().items() if v is not None}
         
         if "is_completed" in update_dict:
             update_dict["completed_at"] = (datetime.datetime.utcnow().isoformat() + "Z") if update_dict["is_completed"] else None
 
-        if is_supabase_configured and supabase:
+        client = get_supabase_client(token)
+        if is_supabase_configured and client:
             try:
-                response = supabase.table("tasks").update(update_dict).eq("id", task_id).eq("user_id", user_id).execute()
+                response = client.table("tasks").update(update_dict).eq("id", task_id).eq("user_id", user_id).execute()
                 if response.data and len(response.data) > 0:
                     return response.data[0]
             except Exception as e:
@@ -220,10 +224,11 @@ class TaskService:
                 return t
         raise Exception("Task not found")
 
-    async def delete_task(self, task_id: str, user_id: str) -> None:
-        if is_supabase_configured and supabase:
+    async def delete_task(self, task_id: str, user_id: str, token: str = None) -> None:
+        client = get_supabase_client(token)
+        if is_supabase_configured and client:
             try:
-                supabase.table("tasks").delete().eq("id", task_id).eq("user_id", user_id).execute()
+                client.table("tasks").delete().eq("id", task_id).eq("user_id", user_id).execute()
                 return
             except Exception as e:
                 print(f"Supabase delete failed. Applying to local. Error: {e}")
@@ -233,10 +238,11 @@ class TaskService:
         filtered = [t for t in tasks if t["id"] != task_id]
         save_local_tasks(filtered, user_id)
 
-    async def delete_all_tasks(self, user_id: str) -> None:
-        if is_supabase_configured and supabase:
+    async def delete_all_tasks(self, user_id: str, token: str = None) -> None:
+        client = get_supabase_client(token)
+        if is_supabase_configured and client:
             try:
-                supabase.table("tasks").delete().eq("user_id", user_id).execute()
+                client.table("tasks").delete().eq("user_id", user_id).execute()
                 return
             except Exception as e:
                 print(f"Supabase delete all failed. Error: {e}")
