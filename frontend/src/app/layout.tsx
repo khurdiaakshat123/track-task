@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ApexTask // Premium Task Management Dashboard",
+  title: "EpexTASK // Premium Task Management Dashboard",
   description: "Track, prioritize, and master your daily workflow with our sleek, Supabase-backed task organizer.",
 };
 

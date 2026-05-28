@@ -458,7 +458,7 @@ export default function Home() {
           </div>
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-              ApexTask
+              EpexTASK
               <span className="text-xs font-semibold px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                 v1.0
               </span>
@@ -1578,7 +1578,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="mt-auto pt-16 pb-4 border-t border-zinc-900 text-center text-xs text-zinc-650 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p>© 2026 ApexTask. Designed with Next.js & Supabase.</p>
+        <p>© 2026 EpexTASK. Designed with Next.js & Supabase.</p>
         <div className="flex gap-4">
           <span className="text-zinc-500">Tailwind v4.0</span>
           <span className="text-zinc-500">TypeScript</span>

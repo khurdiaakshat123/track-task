@@ -95,7 +95,7 @@ export default function AuthForm({ onAuthSuccess }: AuthFormProps) {
           <Lock className="text-white" size={22} />
         </motion.div>
         <h2 className="text-2xl font-extrabold text-white tracking-tight">
-          {isSignUp ? 'Create your Account' : 'Welcome to ApexTask'}
+          {isSignUp ? 'Create your Account' : 'Welcome to EpexTASK'}
         </h2>
         <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
           {isSignUp ? 'Sign up to lock in your private schedule.' : 'Sign in to access your secure developer workspace.'}

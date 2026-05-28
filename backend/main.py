@@ -5,7 +5,7 @@ import schemas
 from task_service import task_service
 from database import supabase, is_supabase_configured
 
-app = FastAPI(title="Task Tracker API", description="Python FastAPI Backend for Task Tracker")
+app = FastAPI(title="EpexTASK API", description="Python FastAPI Backend for EpexTASK")
 
 # Configure CORS
 app.add_middleware(
@@ -58,7 +58,7 @@ async def get_current_user(authorization: Optional[str] = Header(None)) -> Dict[
     # Local fallback
     return {
         "id": "local-user",
-        "email": "guest@apextask.local"
+        "email": "guest@epextask.local"
     }
 
 @app.get("/api/health")
